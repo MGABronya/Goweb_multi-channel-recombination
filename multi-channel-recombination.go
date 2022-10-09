@@ -40,17 +40,18 @@ func branch(x int) chan int {
 // @title    Recombination
 // @description   将传入的多路通道复合
 // @auth      MGAronya（张健）             2022-10-09 23:54
-// @param     chs ...chan int			多路通道
-// @return    chan int					用于传出结果的通达
-func Recombination(chs ...chan int) chan int {
+// @param     branches ...chan int			多路通道
+// @return    chan int					    用于传出结果的通达
+func Recombination(branches ...chan int) chan int {
 	ch := make(chan int)
 
-	for _, c := range chs {
-		// TODO 此处要明确传值
-		go func(c chan int) {
+	// TODO select 会尝试着依次取出各个通道中的值
+	for i := 0; i < len(branches); i++ {
+		select {
+		case v1 := <-branches[i]:
 			// TODO 复合
-			ch <- <-c
-		}(c)
+			ch <- v1
+		}
 	}
 
 	return ch
